@@ -1,5 +1,5 @@
 /*
- * Binary Tree - Team Yellow
+ * Binary Tree - Michael Brown
  * ---------------------------
  *
  * This program reads a file with several lower-cased words on one line
@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 #include <string.h>
 
 /* This is the size of the buffer that is used to read from the file.
@@ -20,7 +19,7 @@
 
 /* This is the index of the input file that is to be read. It is also
  * used to create the output file. */
-char INPUT_IDEX;
+#define INPUT_IDEX "02"
 
 
 /*
@@ -58,7 +57,7 @@ char * output_name;         /* The eventual name of the output file. */
 
 /*
  * add_node
- *
+ * 
  * This grabs the word from the buffer and places it inside of its own
  * node. After that, it traverses the tree in order to find where it
  * should be placed.
@@ -195,18 +194,16 @@ void output_lsr(struct t_node * node_to_print) {
  *
  * No arguments or return value.
  * */
-void output_tree() {
+void output_tree(char num[]) {
 
     printf("Printing tree to output...\n");
 
-    /* Compose the name of the output file. */
-    output_name = (char *)malloc(13 * sizeof(char));
-    strcpy(output_name, "output");
-    strcat(output_name, INPUT_IDEX);
-    strcat(output_name, ".txt");
+    char outputfilename[] = {"output??.txt"};
+    outputfilename[6] = num[5];
+    outputfilename[7] = num[6];
 
     /* Open the output file and start the recursion. */
-    output_file = fopen(output_name, "w");
+    output_file = fopen(outputfilename, "w");
     printf("\tOutput file opened\n");
     output_lsr(b_tree.root);
     fclose(output_file);
@@ -262,23 +259,13 @@ void destroy_tree() {
  *
  * No arguments or return value.
  * */
-int main(int argc, char *argv[]) {
-
-    /* Compose the name of the input file. */
-    input_name = (char *)malloc(12 * sizeof(char));
-    input_name = argv[1];
-    char *parse[20];
-    strcpy(parse.argv[1]);
-    INPUT_INDEX = parse[5];
-    strcat(INPUT_INDEX, parse[6]);
-
-    // strcpy(input_name, "input");
-    // strcat(input_name, INPUT_IDEX);
-    // strcat(input_name, ".txt");
+int main(char *argc, char **argv) {
 
     /* Read the file, word by word, and give each word a node. */
     printf("Opening file to read: %s\n", input_name);
-    fp = fopen(input_name, "r");
+    fp = fopen(argv[1], "r");
+    char parse[13];
+    strcpy(parse, argv[1]);
 
     /* The first word becomes the root. */
     printf("Creating root...\n");
@@ -306,9 +293,8 @@ int main(int argc, char *argv[]) {
     fclose(fp);
     printf("Tree created!\n");
 
-    output_tree();
+    output_tree(parse);
 
     destroy_tree();
-
     return 0;
 }

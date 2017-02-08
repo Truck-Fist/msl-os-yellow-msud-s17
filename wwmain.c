@@ -1,7 +1,7 @@
 /*
  * Binary Tree - Michael Brown
  * ---------------------------
- * 
+ *
  * This program reads a file with several lower-cased words on one line
  * and puts them into a binary tree. The tree is then read from left to
  * right and the words are output to a text file with the number of
@@ -61,24 +61,24 @@ char * output_name;         /* The eventual name of the output file. */
  * This grabs the word from the buffer and places it inside of its own
  * node. After that, it traverses the tree in order to find where it
  * should be placed.
- * 
+ *
  * No arguments or return value.
  * */
 void add_node() {
-	
+
     printf("\tAdding node...\n");
     struct t_node * test_node;
     struct t_node * new_node;
-    
+
     /* This gets set to 1 when the node finds its place. */
     int placement_okay;
-    
+
     /* This is used to numerically represent the new word. */
     int x;
-    
+
     /* This is used to numerically represent a word on the tree. */
     int y;
-    
+
     /* This is used to look through each letter in the word to find
      * one that is unique to that word for the sake of sorting them. */
     int i;
@@ -87,7 +87,7 @@ void add_node() {
     new_node = (struct t_node *)malloc(sizeof(struct t_node));
     int len = 0;
     while(buffer[len] != '\0') {
-		
+
 		len = len + 1;
 	}
     new_node->word = (char *)malloc(len * sizeof(char));
@@ -100,30 +100,30 @@ void add_node() {
     test_node = b_tree.root;
     placement_okay = 0;
     while(placement_okay == 0) {
-	
+
         /* Find the first unique character in each word */
         x = 0;
         y = 0;
         i = 0;
         while(x == y && new_node->word[i] != '\0'
         && test_node->word[i] != '\0') {
-	
+
             x = new_node->word[i] - '0';
             y = test_node->word[i] - '0';
             i = i + 1;
         }
-        
+
         /* If the new word happens to be a shorter version of one
          * that exists already, force it to be treated as though it were
          * lower in the alphabet.
-         * 
+         *
          * Example:
          * Alternate and Alter
          * Without the following check, they would be counted as the
          * same word.
          * */
         if(new_node->word[i] == '\0' && test_node->word[i] != '\0') {
-			
+
 			x = -1;
 		}
 
@@ -154,21 +154,21 @@ void add_node() {
 
 /*
  * output_lsr
- * 
+ *
  * This outputs the left node's word, then the word of the node passed
  * to it, and then the right node's word. This is a recursive method.
- * 
+ *
  * Arguments:
  *     node_to_print: This is the node that is to be traversed and
  *         printed.
- * 
+ *
  * No return value.
  * */
 void output_lsr(struct t_node * node_to_print) {
-		
+
     /* If it has a left node, output that, first. */
     if(node_to_print->less != NULL) {
-	
+
         output_lsr(node_to_print->less);
     }
 
@@ -179,7 +179,7 @@ void output_lsr(struct t_node * node_to_print) {
 
     /* If the node has a right node, output it now. */
     if(node_to_print->greater != NULL) {
-	
+
         output_lsr(node_to_print->greater);
     }
 }
@@ -187,11 +187,11 @@ void output_lsr(struct t_node * node_to_print) {
 
 /*
  * output_tree
- * 
+ *
  * This initiates the printing of the tree to a text file. It opens the
  * file, starts the recursion with the root, and then closes the text
  * file.
- * 
+ *
  * No arguments or return value.
  * */
 void output_tree(char num[]) {
@@ -201,7 +201,7 @@ void output_tree(char num[]) {
     char outputfilename[] = {"output??.txt"};
     outputfilename[6] = num[5];
     outputfilename[7] = num[6];
-    
+
     /* Open the output file and start the recursion. */
     output_file = fopen(outputfilename, "w");
     printf("\tOutput file opened\n");
@@ -212,24 +212,24 @@ void output_tree(char num[]) {
 
 /*
  * destroy_node
- * 
+ *
  * This frees the memory for one particular node and recursively calls
  * itself for the left and right nodes of that particular node.
- * 
+ *
  * Arguments:
  *     node_to_destroy: The node to be traversed and then destroyed
- * 
+ *
  * No return value.
  * */
 void destroy_node(struct t_node * node_to_destroy) {
 
     printf("\tDestroying %s\n", node_to_destroy->word);
     if(node_to_destroy->less != NULL) {
-		
+
         destroy_node(node_to_destroy->less);
 	}
     if(node_to_destroy->greater != NULL) {
-	
+
         destroy_node(node_to_destroy->greater);
     }
     free(node_to_destroy);
@@ -238,10 +238,10 @@ void destroy_node(struct t_node * node_to_destroy) {
 
 /*
  * destroy_tree
- * 
+ *
  * This initiates the detruction of the entire tree starting with the
  * root.
- * 
+ *
  * No arguments or return value.
  * */
 void destroy_tree() {
@@ -253,14 +253,14 @@ void destroy_tree() {
 
 /*
  * main
- * 
+ *
  * The main method opens the text file, reads in every word, creates
  * the tree, prints it to a text file, and then destroys the tree.
- * 
+ *
  * No arguments or return value.
  * */
 int main(char *argc, char **argv) {
-    
+
     /* Read the file, word by word, and give each word a node. */
     printf("Opening file to read: %s\n", input_name);
     fp = fopen(argv[1], "r");
@@ -275,7 +275,7 @@ int main(char *argc, char **argv) {
     root->count = 1;
     int len = 0;
     while(buffer[len] != '\0') {
-		
+
 		len = len + 1;
 	}
     root->word = (char *)malloc(len * sizeof(char));
@@ -287,7 +287,7 @@ int main(char *argc, char **argv) {
     /* Read in the remaining words. */
     printf("Reading remaining words...\n");
     while(fscanf(fp, "%s", buffer) != EOF) {
-	
+
         add_node();
     }
     fclose(fp);
