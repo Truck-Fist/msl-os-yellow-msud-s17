@@ -1,8 +1,6 @@
 ## Operating Systems Concepts: Programming Assignment C1
 ## Team Yellow
 
-* * * 
-
 ### Overview
 This program takes in a text file with a single line of words separated by spaces and will, one by one, load each word into a node in a binary tree. It will count how many times a particular word occurs and will include that count in the output file.
 
