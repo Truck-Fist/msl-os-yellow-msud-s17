@@ -180,7 +180,7 @@ void output_lsr(struct t_node * node_to_print) {
  * file, starts the recursion with the root, and then closes the text
  * file.
  *
- * No arguments or return value.
+ * No return value.
  * */
 void output_tree(char num[]) {
 
