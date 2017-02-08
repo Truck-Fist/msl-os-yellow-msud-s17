@@ -1,5 +1,5 @@
 /*
- * Binary Tree - Michael Brown
+ * Binary Tree - Team Yellow
  * ---------------------------
  *
  * This program reads a file with several lower-cased words on one line
@@ -16,10 +16,6 @@
 /* This is the size of the buffer that is used to read from the file.
  * This means that no word can be larger than this size. */
 #define BUFFER_SIZE 100
-
-/* This is the index of the input file that is to be read. It is also
- * used to create the output file. */
-#define INPUT_IDEX "02"
 
 
 /*
@@ -51,27 +47,20 @@ struct tree b_tree;        /* Create the tree itself. */
 FILE *fp;                   /* The pointer to the input file. */
 FILE *output_file;          /* The pointer to the output file. */
 char buffer[BUFFER_SIZE];   /* Where the word is placed when read. */
-char * input_name;          /* The eventual name of the input file. */
-char * output_name;         /* The eventual name of the output file. */
 
 
 /*
- * add_node
- * 
- * This grabs the word from the buffer and places it inside of its own
- * node. After that, it traverses the tree in order to find where it
- * should be placed.
+ * add_word
  *
- * No arguments or return value.
+ * This grabs the word from the buffer and traverses the tree in order
+ * to find an identical word and increment its count or find
+ * where it should be placed as a new word in the tree.
+ *
+ * No return value.
  * */
-void add_node() {
+void add_word(struct t_node * test_node) {
 
-    printf("\tAdding node...\n");
-    struct t_node * test_node;
-    struct t_node * new_node;
-
-    /* This gets set to 1 when the node finds its place. */
-    int placement_okay;
+    printf("\tAdding word...\n");
 
     /* This is used to numerically represent the new word. */
     int x;
@@ -82,72 +71,72 @@ void add_node() {
     /* This is used to look through each letter in the word to find
      * one that is unique to that word for the sake of sorting them. */
     int i;
+    /* Find the first unique character in each word */
+    x = 0;
+    y = 0;
+    i = 0;
+    while(x == y && buffer[i] != '\0'
+          && test_node->word[i] != '\0') {
 
-	/* Create the new node. */
-    new_node = (struct t_node *)malloc(sizeof(struct t_node));
-    int len = 0;
-    while(buffer[len] != '\0') {
+        x = buffer[i] - '0';
+        y = test_node->word[i] - '0';
+        i = i + 1;
+    }
 
-		len = len + 1;
-	}
-    new_node->word = (char *)malloc(len * sizeof(char));
-    strcpy(new_node->word, buffer);
-    new_node->count = 1;
-    new_node->greater = NULL;
-    new_node->less = NULL;
+    /* If the new word happens to be a shorter version of one
+     * that exists already, force it to be treated as though it were
+     * lower in the alphabet.
+     *
+     * Example:
+     * Alternate and Alter
+     * Without the following check, they would be counted as the
+     * same word.
+     * */
+    if(buffer[i] == '\0' && test_node->word[i] != '\0') {
+        x = y - 1;
+    } else if(buffer[i] != '\0' && test_node->word[i] == '\0') {
+        x = y + 1;
+    }
 
-    /* Find out where to place this new node in the tree */
-    test_node = b_tree.root;
-    placement_okay = 0;
-    while(placement_okay == 0) {
+    printf("\t\tComparing test node: %s with new word: %s\n",
+           test_node->word, buffer);
 
-        /* Find the first unique character in each word */
-        x = 0;
-        y = 0;
-        i = 0;
-        while(x == y && new_node->word[i] != '\0'
-        && test_node->word[i] != '\0') {
-
-            x = new_node->word[i] - '0';
-            y = test_node->word[i] - '0';
-            i = i + 1;
-        }
-
-        /* If the new word happens to be a shorter version of one
-         * that exists already, force it to be treated as though it were
-         * lower in the alphabet.
-         *
-         * Example:
-         * Alternate and Alter
-         * Without the following check, they would be counted as the
-         * same word.
-         * */
-        if(new_node->word[i] == '\0' && test_node->word[i] != '\0') {
-
-			x = -1;
-		}
-
-        printf("\t\tComparing test node: %s with new word: %s\n",
-        test_node->word, new_node->word);
-
-        if(x > y) { /* We need to go to the right in the tree. */
-            if(test_node->greater == NULL) {
-                placement_okay = 1;
-                test_node->greater = new_node;
-            } else {
-                test_node = test_node->greater;
+    if(x > y) { /* We need to go to the right in the tree. */
+        if(test_node->greater == NULL) {
+            printf("\tAdding node...\n");
+            test_node->greater = (struct t_node *)malloc(sizeof(struct t_node));
+            int len = 0;
+            while(buffer[len] != '\0') {
+                len = len + 1;
             }
-        } else if(x < y) { /* We need to go to the left in the tree. */
-            if(test_node->less == NULL) {
-                placement_okay = 1;
-                test_node->less = new_node;
-            } else {
-                test_node = test_node->less;
-            }
-        } else { /* The two nodes are the same. */
-            placement_okay = 1;
-            test_node->count = test_node->count + 1;
+            char * word = (char *)malloc(len * sizeof(char));
+            strcpy(word, buffer);
+            test_node->greater->word = word;
+            test_node->greater->count = 1;
+            test_node->greater->greater = NULL;
+            test_node->greater->less = NULL;
+        } else {
+            add_word(test_node->greater);
         }
+    } else if(x < y) { /* We need to go to the left in the tree. */
+        if(test_node->less == NULL) {
+            printf("\tAdding node...\n");
+            test_node->less = (struct t_node *)malloc(sizeof(struct t_node));
+            int len = 0;
+            while(buffer[len] != '\0') {
+                len = len + 1;
+            }
+            char * word = (char *)malloc(len * sizeof(char));
+            strcpy(word, buffer);
+            test_node->less->word = word;
+            test_node->less->count = 1;
+            test_node->less->greater = NULL;
+            test_node->less->less = NULL;
+        } else {
+            add_word(test_node->less);
+        }
+    } else { /* The two nodes are the same. */
+        test_node->count = test_node->count + 1;
     }
 }
 
@@ -174,8 +163,7 @@ void output_lsr(struct t_node * node_to_print) {
 
     /* Output the node's own word. */
     printf("\tPlacing %s into file\n", node_to_print->word);
-    fprintf(output_file, node_to_print->word);
-    fprintf(output_file, ": %d\n", node_to_print->count);
+    fprintf(output_file, "%s: %d\n", node_to_print->word, node_to_print->count);
 
     /* If the node has a right node, output it now. */
     if(node_to_print->greater != NULL) {
@@ -198,9 +186,9 @@ void output_tree(char num[]) {
 
     printf("Printing tree to output...\n");
 
-    char outputfilename[] = {"output??.txt"};
-    outputfilename[6] = num[5];
-    outputfilename[7] = num[6];
+    char outputfilename[] = "myoutput??.txt";
+    outputfilename[8] = num[5];
+    outputfilename[9] = num[6];
 
     /* Open the output file and start the recursion. */
     output_file = fopen(outputfilename, "w");
@@ -232,6 +220,7 @@ void destroy_node(struct t_node * node_to_destroy) {
 
         destroy_node(node_to_destroy->greater);
     }
+    free(node_to_destroy->word);
     free(node_to_destroy);
 }
 
@@ -259,13 +248,13 @@ void destroy_tree() {
  *
  * No arguments or return value.
  * */
-int main(char *argc, char **argv) {
+int main(int argc, char **argv) {
 
     /* Read the file, word by word, and give each word a node. */
-    printf("Opening file to read: %s\n", input_name);
     fp = fopen(argv[1], "r");
     char parse[13];
     strcpy(parse, argv[1]);
+    printf("Opened file to read: %s\n", parse);
 
     /* The first word becomes the root. */
     printf("Creating root...\n");
@@ -288,7 +277,7 @@ int main(char *argc, char **argv) {
     printf("Reading remaining words...\n");
     while(fscanf(fp, "%s", buffer) != EOF) {
 
-        add_node();
+        add_word(root);
     }
     fclose(fp);
     printf("Tree created!\n");
